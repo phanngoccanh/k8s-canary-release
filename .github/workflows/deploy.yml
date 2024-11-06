@@ -114,3 +114,22 @@ jobs:
           kubectl delete -f ingress.yml --kubeconfig=./kubernetes-config
           kubectl annotate ingress myapp-canary nginx.ingress.kubernetes.io/canary- --kubeconfig=./kubernetes-config
           kubectl annotate ingress myapp-canary nginx.ingress.kubernetes.io/canary-weight- --kubeconfig=./kubernetes-config
+  rollback:
+    runs-on: ubuntu-latest
+    if: failure() # Executes if any of the previous jobs fail
+    needs: [canary-10-percent, canary-50-percent, canary-100-percent, finalize-deployment]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > ./kubernetes-config
+
+      - name: Rollback to Stable
+        run: |
+          kubectl apply -f deployment.yml --kubeconfig=./kubernetes-config
+          kubectl apply -f ingress.yml --kubeconfig=./kubernetes-config
+
+          kubectl delete -f deployment-canary.yml --kubeconfig=./kubernetes-config
+          kubectl delete -f ingress-canary.yml --kubeconfig=./kubernetes-config
