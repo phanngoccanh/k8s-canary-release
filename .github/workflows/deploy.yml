@@ -17,11 +17,6 @@ jobs:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
 
-      # - name: Clean up if needed
-      #   run: |
-      #     kubectl delete -f deployment-canary.yml --kubeconfig=./kubernetes-config
-      #     kubectl delete -f ingress-canary.yml --kubeconfig=./kubernetes-config
-
       - name: Deploy Stable to Kubernetes
         run: |
           kubectl apply -f deployment.yml --kubeconfig=./kubernetes-config
