@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+spec:
+  ingressClassName: "nginx"
+  rules:
+    - host: 28215d.learnk8s.jamesisme.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: myapp-svc-canary
+                port:
+                  name: http
